@@ -86,7 +86,12 @@ class OlTsLayerVector extends OlLayerVector {
 
 const etiquetaCluster = {
     count: function(txt, feature, field) {
-        return txt.replace(field[0], feature.get('features').length);
+        var f = feature.get('features');
+        var c = 0;
+        for (var j = f.length - 1; j >= 0; --j) {
+            c += (f[j].get(field[0]) || 1) * 1;
+        }
+        return txt.replace(field[0], c);
     },
     sum: function(txt, feature, field) {
         const f = feature.get('features');
