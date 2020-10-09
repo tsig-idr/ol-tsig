@@ -86,7 +86,12 @@ class OlTsLayerVector extends OlLayerVector {
 
 const etiquetaCluster = {
     count: function(txt, feature, field) {
-        return txt.replace(field[0], feature.get('features').length);
+        const f = feature.get('features');
+        var c = 0;
+        for (var j = f.length - 1; j >= 0; --j) {
+            c += (f[j].get(field[0]) || 1) * 1;
+        }
+        return txt.replace(field[0], c);
     },
     sum: function(txt, feature, field) {
         const f = feature.get('features');
@@ -97,7 +102,7 @@ const etiquetaCluster = {
         if (field[2] !== undefined) {
             s = s.toFixed(field[2]);
         }
-        return txt.replace(field[1], s);
+        return txt.replace(field[1], prettify(s));
     },
     media: function(txt, feature, field) {
         let s = 0;
@@ -122,6 +127,15 @@ const etiquetaCluster = {
     }
 };
 
+function prettify(n) {
+    if (n >= 1000000) {
+        return Math.round(n / 1000000) + 'M';
+    }
+    if (n >= 1000) {
+        return Math.round(n / 1000) + 'K';
+    }
+    return n;
+}
 // ==================================================
 
 export { OlTsLayerVector };
