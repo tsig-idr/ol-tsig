@@ -183,7 +183,11 @@ class OlTsMap extends OlMap {
             this.setTarget('_divCpMap');
         }
         this.once('rendercomplete', () => {
-            var mapCanvas = document.createElement('canvas');
+            if(opt.canvasElementById){
+                var mapCanvas = document.getElementById(opt.canvasElementById)
+            }else{
+                var mapCanvas = document.createElement('canvas');
+            }
             mapCanvas.width = size[0];
             mapCanvas.height = size[1];
             var mapContext = mapCanvas.getContext('2d');
@@ -201,12 +205,16 @@ class OlTsMap extends OlMap {
                     }
                 }
             );
-            var dataURL = mapCanvas.toDataURL('image/png');
-            document.getElementById(opt.target).src = dataURL;
             if (captureTransform) {
                 this.setTarget(oriTarget);
                 this.setView(oriView);
                 divCp.parentNode.removeChild(divCp);
+            }
+            try{
+                var dataURL = mapCanvas.toDataURL('image/png').replace("image/png", "image/octet-stream");
+                document.getElementById(opt.target).src = dataURL;
+            }catch (e){
+                throw e;
             }
         });
         if (captureTransform) {
