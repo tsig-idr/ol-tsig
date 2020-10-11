@@ -164,63 +164,73 @@ class OlTsMap extends OlMap {
     // -------Otras funciones ------------------------------------------ <<<<<
 
     captureMap(opt) {
-        var oriView = this.getView();
-        var size = opt.size || this.getSize();
-        var bb = opt.bbox || oriView.calculateExtent(this.getSize());
-        var captureTransform = (opt.size || opt.bbox);
+        if (opt.imageTarget || opt.canvasTarget) {
+            var oriView = this.getView();
+            var size = opt.size || this.getSize();
+            var bb = opt.bbox || oriView.calculateExtent(this.getSize());
+            var captureTransform = (opt.size || opt.bbox);
 
-        if (captureTransform) {
-            var newView = new OlView({
-                center: oriView.getCenter(),
-                zoom: oriView.getZoom()
-            });
-            this.setView(newView);
-            var divCp = document.createElement('div');
-            divCp.setAttribute('id', '_divCpMap');
-            divCp.setAttribute('style', 'position:absolute;right:100%;width:' + size[0] + 'px;height:' + size[1] + 'px;');
-            document.body.appendChild(divCp);
-            var oriTarget = this.getTarget();
-            this.setTarget('_divCpMap');
-        }
-        this.once('rendercomplete', () => {
-            if(opt.canvasElementById){
-                var mapCanvas = document.getElementById(opt.canvasElementById)
-            }else{
-                var mapCanvas = document.createElement('canvas');
+            if (captureTransform) {
+                var newView = new OlView({
+                    center: oriView.getCenter(),
+                    zoom: oriView.getZoom()
+                });
+                this.setView(newView);
+                var divCp = document.createElement('div');
+                divCp.setAttribute('id', '_divCpMap');
+                divCp.setAttribute('style', 'position:absolute;right:100%;width:' + size[0] + 'px;height:' + size[1] + 'px;');
+                document.body.appendChild(divCp);
+                var oriTarget = this.getTarget();
+                this.setTarget('_divCpMap');
             }
-            mapCanvas.width = size[0];
-            mapCanvas.height = size[1];
-            var mapContext = mapCanvas.getContext('2d');
-            Array.prototype.forEach.call(
-                document.querySelectorAll('.ol-layer canvas'),
-                (canvas) => {
-                    if (canvas.width > 0) {
-                        var opacity = canvas.parentNode.style.opacity;
-                        mapContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
-                        var transform = canvas.style.transform;
-                        // eslint-disable-next-line no-useless-escape
-                        var matrix = transform.match(/^matrix\(([^\(]*)\)$/)[1].split(',').map(Number);
-                        CanvasRenderingContext2D.prototype.setTransform.apply(mapContext, matrix);
-                        mapContext.drawImage(canvas, 0, 0);
+            this.once('rendercomplete', () => {
+                var mapCanvas;
+                if (opt.canvasTarget) {
+                    mapCanvas = document.getElementById(opt.canvasTarget);
+                } else {
+                    mapCanvas = document.createElement('canvas');
+                }
+                if (mapCanvas) {
+                    mapCanvas.width = size[0];
+                    mapCanvas.height = size[1];
+                    var mapContext = mapCanvas.getContext('2d');
+                    Array.prototype.forEach.call(
+                        document.querySelectorAll('.ol-layer canvas'),
+                        (canvas) => {
+                            if (canvas.width > 0) {
+                                var opacity = canvas.parentNode.style.opacity;
+                                mapContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
+                                var transform = canvas.style.transform;
+                                // eslint-disable-next-line no-useless-escape
+                                var matrix = transform.match(/^matrix\(([^\(]*)\)$/)[1].split(',').map(Number);
+                                CanvasRenderingContext2D.prototype.setTransform.apply(mapContext, matrix);
+                                mapContext.drawImage(canvas, 0, 0);
+                            }
+                        }
+                    );
+                }
+                if (captureTransform) {
+                    this.setTarget(oriTarget);
+                    this.setView(oriView);
+                    divCp.parentNode.removeChild(divCp);
+                }
+                if (opt.imageTarget) {
+                    // eslint-disable-next-line no-useless-catch
+                    try {
+                        var dataURL = mapCanvas.toDataURL('image/png');
+                        document.getElementById(opt.imageTarget).src = dataURL;
+                    } catch (e) {
+                        throw e;
                     }
                 }
-            );
+            });
             if (captureTransform) {
-                this.setTarget(oriTarget);
-                this.setView(oriView);
-                divCp.parentNode.removeChild(divCp);
+                newView.fit(bb, {
+                    padding: [10, 10, 10, 10]
+                });
+            } else {
+                this.renderSync();
             }
-            try{
-                var dataURL = mapCanvas.toDataURL('image/png').replace("image/png", "image/octet-stream");
-                document.getElementById(opt.target).src = dataURL;
-            }catch (e){
-                throw e;
-            }
-        });
-        if (captureTransform) {
-            newView.fit(bb, { padding: [10, 10, 10, 10] });
-        } else {
-            this.renderSync();
         }
     }
 }

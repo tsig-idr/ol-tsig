@@ -42,7 +42,10 @@ const CaptureMap = (function(Control) {
             var imgCp = document.createElement('img');
             imgCp.id = 'imgCaptureMap';
             divCp.appendChild(imgCp);
-            this.getMap().captureMap({ target: 'imgCaptureMap', size: [400, 300] });
+            var canvasCp = document.createElement('canvas');
+            canvasCp.id = 'canvasCaptureMap';
+            divCp.appendChild(canvasCp);
+            this.getMap().captureMap({ imageTarget: 'imgCaptureMap', canvasTarget: 'canvasCaptureMap', size: [400, 200] });
         } else {
             divMP.parentNode.removeChild(divMP);
         }
