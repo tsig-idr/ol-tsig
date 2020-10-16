@@ -25,6 +25,10 @@ function json2Layer(layer) {
         ly.style = olTsJson2Style.json2Style(ly.style);
     }
     const l = new (layersClass())[ly.type](ly);
+    if (ly.styleFunction) {
+        l.defaultStyle = l.getStyle();
+        l.setStyle(window[ly.styleFunction]);
+    }
     return l;
 }
 

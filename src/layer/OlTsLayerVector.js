@@ -19,7 +19,7 @@ class OlTsLayerVector extends OlLayerVector {
             const labels = options.labels;
             const _style = this.getStyle();
             if (labels.fields) {
-                this.setStyle((feature) => {
+                this.setStyle((feature, resolution) => {
                     const st = _style.clone();
                     const tx = st.getText();
                     if (tx && labels.visible) {
@@ -38,8 +38,8 @@ class OlTsLayerVector extends OlLayerVector {
                     return st;
                 });
             } else {
-                this.setStyle((feature) => {
-                    const st = _style.clone();
+                this.setStyle((feature, resolution) => {
+                    const st = (typeof _style === 'function') ? _style(feature, resolution) : _style.clone();
                     const tx = st.getText();
                     tx && tx.setText((labels.visible) ? feature.get(labels.field) : undefined);
                     return st;

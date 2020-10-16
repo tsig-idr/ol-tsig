@@ -91,6 +91,47 @@ var styleEdition = {
 */
 
 // ------------------------------------------------------------------
+/*
+ejemplo de style de entrada:
+
+{
+    type: 'classifyByValue',
+    field: 'nombreCampo',
+    domain: {
+        'valorField1': { fill: { color: 'rgba(250,250,250,0.1)' }},
+        'valorField2': { fill: { color: 'rgba(250,200,200,0.1)' }}
+    },
+    default: {
+        stroke: {
+            color: '#09F',
+            width: 3
+        },
+        fill: {
+            color: 'rgba(250,250,250,0.1)'
+        },
+        zIndex: 1
+    }
+}
+
+*/
+function classifyByValue(style) {
+    const sty = Object.assign({}, style);
+    const styCache = {};
+    const styDefault = new olStyle.Style(simpleStyle(sty.default));
+    return (feature, resolution) => {
+        const fieldValue = feature.get(sty.field);
+        if (styCache[fieldValue]) {
+            return styCache[fieldValue];
+        }
+        if (sty.domain[fieldValue]) {
+            styCache[fieldValue] = new olStyle.Style(simpleStyle(Object.assign(Object.assign({}, sty.default), sty.domain[fieldValue])));
+            return styCache[fieldValue];
+        }
+        return styDefault;
+    };
+}
+
+// ------------------------------------------------------------------
 
 function simpleStyle(style) {
     const sty = {};
@@ -115,7 +156,11 @@ function json2Style(style) {
         }
         return l;
     }
-    return new olStyle.Style(simpleStyle(style));
+    if (style.type === 'classifyByValue') {
+        return classifyByValue(style);
+    } else {
+        return new olStyle.Style(simpleStyle(style));
+    }
 }
 
 function styleSelect(objJSON) {
@@ -131,7 +176,8 @@ function styleEdit(objJSON) {
 const olTsJson2Style = {
     json2Style: json2Style,
     styleSelect: styleSelect,
-    styleEdit: styleEdit
+    styleEdit: styleEdit,
+    classifyByValue: classifyByValue
 };
 
 export default olTsJson2Style;

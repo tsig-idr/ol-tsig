@@ -1,3 +1,5 @@
+import { Style } from 'ol/style';
+
 var key = 'pk.eyJ1IjoiYWhvY2V2YXIiLCJhIjoiY2pzbmg0Nmk5MGF5NzQzbzRnbDNoeHJrbiJ9.7_-_gL8ur7ZtEiNwRfCy7Q';
 
 var mapa = {
@@ -126,24 +128,33 @@ var mapa = {
                 }
             },
             style: {
-                fill: {
-                    color: 'rgba(0, 0, 255, 0.1)'
+                type: 'classifyByValue',
+                field: 'name',
+                domain: {
+                    Spain: { fill: { color: 'rgba(250,50,50,0.3)' } },
+                    France: { fill: { color: 'rgba(250,20,200,0.4)' } }
                 },
-                stroke: {
-                    color: '#0f0f00',
-                    width: 1
-                },
-                text: {
-                    font: '12px Calibri,sans-serif',
+                default: {
                     fill: {
-                        color: '#000'
+                        color: 'rgba(0, 0, 255, 0.1)'
                     },
                     stroke: {
-                        color: '#fff',
-                        width: 3
+                        color: '#0f0f00',
+                        width: 1
+                    },
+                    text: {
+                        font: '12px Calibri,sans-serif',
+                        fill: {
+                            color: '#000'
+                        },
+                        stroke: {
+                            color: '#fff',
+                            width: 3
+                        }
                     }
                 }
             },
+            // styleFunction: 'pepe',
             labels: {
                 visible: true,
                 field: 'name'
@@ -294,6 +305,13 @@ var mapa = {
             ]
         }
     ]
+};
+
+window.olTsigStyle = {};
+window.pepe = function(feature, resolution) {
+    console.log('pepe');
+    console.log(resolution, feature);
+    return new Style();
 };
 
 export default mapa;
