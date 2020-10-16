@@ -124,7 +124,7 @@ function classifyByValue(style) {
             return styCache[fieldValue];
         }
         if (sty.domain[fieldValue]) {
-            styCache[fieldValue] = new olStyle.Style(simpleStyle(Object.assign(Object.assign({}, sty.default), sty.domain[fieldValue])));
+            styCache[fieldValue] = new olStyle.Style(simpleStyle(Object.assign({}, sty.default, sty.domain[fieldValue])));
             return styCache[fieldValue];
         }
         return styDefault;
