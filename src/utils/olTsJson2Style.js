@@ -119,13 +119,15 @@ function classifyByValue(style) {
     const styCache = {};
     const styDefault = new olStyle.Style(simpleStyle(sty.default));
     return (feature, resolution) => {
-        const fieldValue = feature.get(sty.field);
-        if (styCache[fieldValue]) {
-            return styCache[fieldValue];
-        }
-        if (sty.domain[fieldValue]) {
-            styCache[fieldValue] = new olStyle.Style(simpleStyle(Object.assign({}, sty.default, sty.domain[fieldValue])));
-            return styCache[fieldValue];
+        if (feature) {
+            const fieldValue = feature.get(sty.field);
+            if (styCache[fieldValue]) {
+                return styCache[fieldValue];
+            }
+            if (sty.domain[fieldValue]) {
+                styCache[fieldValue] = new olStyle.Style(simpleStyle(Object.assign({}, sty.default, sty.domain[fieldValue])));
+                return styCache[fieldValue];
+            }
         }
         return styDefault;
     };
