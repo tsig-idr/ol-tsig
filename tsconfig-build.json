@@ -4,6 +4,7 @@
         "target": "ES5",
         "module": "es2015",
         "sourceMap": true,
+        "moduleResolution": "node",
         "allowJs": true,
         "importHelpers": false,
     },
