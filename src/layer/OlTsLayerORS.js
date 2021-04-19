@@ -20,7 +20,7 @@ class OlTsLayerORS extends OlTsLayerVector {
         const ftemp = feature;
         const xhr = new XMLHttpRequest();
         xhr.open('POST', 'https://api.openrouteservice.org/v2/directions/driving-car/geojson');
-        xhr.setRequestHeader('Accept', 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8');
+        //xhr.setRequestHeader('Accept', 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8');
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.setRequestHeader('Authorization', this.apiKey);
 
