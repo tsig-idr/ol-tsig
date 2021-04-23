@@ -18,9 +18,15 @@ class OlTsLayerORS extends OlTsLayerVector {
     addRoute(feature, noDelete) {
         const self = this;
         const ftemp = feature;
+        const coords = ftemp.getGeometry().clone().transform('EPSG:3857', 'EPSG:4326').getCoordinates();
+        const radious = [];
+        for (let i = 0; i < coords.length; i++) {
+            radious.push(-1);
+        }
+        radious[0] = 5000;
         const xhr = new XMLHttpRequest();
         xhr.open('POST', 'https://api.openrouteservice.org/v2/directions/driving-car/geojson');
-        //xhr.setRequestHeader('Accept', 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8');
+        // xhr.setRequestHeader('Accept', 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8');
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.setRequestHeader('Authorization', this.apiKey);
 
@@ -56,8 +62,8 @@ class OlTsLayerORS extends OlTsLayerVector {
             }
         };
         const body = {
-            coordinates: ftemp.getGeometry().clone().transform('EPSG:3857', 'EPSG:4326').getCoordinates(),
-            radiuses: [5000, -1]
+            coordinates: coords,
+            radiuses: radious
         };
         xhr.send(JSON.stringify(body));
     }
