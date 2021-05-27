@@ -23,24 +23,32 @@ import olTsJson2Style from '../utils/olTsJson2Style';
 
 OlInteractionSelect.prototype.applySelectedStyle_ = function(feature) {
     const key = olGetUid(feature);
-    const f = this.featureLayerAssociation_[key].getStyle();
-    if (typeof f === 'function') {
-        const s = f(feature);
-        const sI = s.getImage && s.getImage();
-        let radio = 0;
-        if (sI) {
-            if (sI.getRadius) {
-                radio = sI.getRadius();
-            } else if (sI.getSize) {
-                radio = Math.max(...sI.getSize()) / 2;
+    // *** Código original ***
+    // if (!(key in this.originalFeatureStyles)) {
+    //     this.originalFeatureStyles[key] = feature.getStyle();
+    // }
+    // feature.setStyle(this.style_);
+    // *** Código original ***
+    if (this.featureLayerAssociation_[key]) {
+        const f = this.featureLayerAssociation_[key].getStyle();
+        if (typeof f === 'function') {
+            const s = f(feature);
+            const sI = s.getImage && s.getImage();
+            let radio = 0;
+            if (sI) {
+                if (sI.getRadius) {
+                    radio = sI.getRadius();
+                } else if (sI.getSize) {
+                    radio = Math.max(...sI.getSize()) / 2;
+                }
             }
+            this.style_.getImage().setRadius(radio);
+            const st = (Array.isArray(s)) ? s.slice() : [s];
+            st.push(this.style_);
+            feature.setStyle(st);
+        } else {
+            feature.setStyle(f);
         }
-        this.style_.getImage().setRadius(radio);
-        const st = (Array.isArray(s)) ? s.slice() : [s];
-        st.push(this.style_);
-        feature.setStyle(st);
-    } else {
-        feature.setStyle(f);
     }
 };
 
@@ -165,6 +173,7 @@ class OlTsMap extends OlMap {
 
     captureMap(opt) {
         if (opt.imageTarget || opt.canvasTarget) {
+            var oriTarget = this.getTarget();
             var oriView = this.getView();
             var size = opt.size || this.getSize();
             var bb = opt.bbox || oriView.calculateExtent(this.getSize());
@@ -180,7 +189,6 @@ class OlTsMap extends OlMap {
                 divCp.setAttribute('id', '_divCpMap');
                 divCp.setAttribute('style', 'position:absolute;right:100%;width:' + size[0] + 'px;height:' + size[1] + 'px;');
                 document.body.appendChild(divCp);
-                var oriTarget = this.getTarget();
                 this.setTarget('_divCpMap');
             }
             this.once('rendercomplete', () => {
