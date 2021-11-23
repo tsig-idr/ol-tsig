@@ -8,6 +8,7 @@ class OlTsLayerORS extends OlTsLayerVector {
         const options = optOptions || {};
         super(options);
         this.apiKey = options.apiKey;
+        this.calculatingRoute = false;
         this.getSource().on('addfeature', (ft) => {
             if (!ft.feature.ruta) {
                 this.addRoute(ft.feature);
@@ -24,6 +25,7 @@ class OlTsLayerORS extends OlTsLayerVector {
             radious.push(-1);
         }
         radious[0] = 5000;
+        self.calculatingRoute = true;
         const xhr = new XMLHttpRequest();
         xhr.open('POST', 'https://api.openrouteservice.org/v2/directions/driving-car/geojson');
         // xhr.setRequestHeader('Accept', 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8');
@@ -59,6 +61,7 @@ class OlTsLayerORS extends OlTsLayerVector {
                         jqXHR: this
                     });
                 }
+                self.calculatingRoute = false;
             }
         };
         const body = {
